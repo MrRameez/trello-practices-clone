@@ -1,0 +1,147 @@
+* {
+  font-family: sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+header {
+  text-align: center;
+  background-color: rgba(110, 109, 109, 0.872);
+  padding: 10px;
+  font-weight: 800;
+  font-size: 18px;
+  height: 50px;
+  width: 100%;
+}
+
+main {
+  display: flex;
+  gap: 30px;
+  margin-top: 80px;
+  margin-right: 2%;
+  overflow-x: auto;
+  align-items: flex-start;
+}
+
+.column {
+  border: 1.5px solid gray;
+  min-width: 200px;
+  min-height: 150px;
+  text-align: center;
+  margin-left: 30px;
+  border-radius: 12px;
+  background-color: rgb(248, 246, 246);
+  overflow: hidden;
+  box-shadow: 2px 2px 0px 1px gray;
+  margin-bottom: 20px;
+}
+
+.column > h3 {
+  font-size: 24px;
+  text-align: center;
+}
+
+p {
+  margin: 10px;
+  background-color: rgba(250, 235, 215, 0.508);
+  margin-top: 5px;
+  font-weight: 600;
+  font-size: 20px;
+  font-family: sans-serif;
+  gap: 10px;
+}
+
+.heading {
+  background-color: rgba(145, 144, 143, 0.508);
+  padding: 10px;
+  font-weight: 800;
+  font-size: 18px;
+}
+
+.column > p {
+  padding: 12px;
+}
+
+.column > form > input {
+  padding: 10px;
+  width: 100%;
+}
+
+::placeholder {
+  font-weight: 800;
+  font-family: sans-serif;
+}
+
+input::placeholder {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+i {
+  background-color: rgb(167, 162, 162);
+  font-size: 30px;
+  margin: 10px;
+}
+
+/* Responsive design */
+@media (max-width: 1200px) {
+  main {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .column {
+    margin: 10px 0;
+  }
+}
+
+@media (max-width: 768px) {
+  header {
+    font-size: 16px;
+    padding: 8px;
+  }
+
+  .column {
+    min-width: 90%;
+    margin: 10px 0;
+  }
+
+  .column > h3 {
+    font-size: 20px;
+  }
+
+  p {
+    font-size: 18px;
+  }
+
+  .column > form > input {
+    padding: 8px;
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  header {
+    font-size: 14px;
+    padding: 6px;
+  }
+
+  .column {
+    min-width: 100%;
+    margin: 5px 0;
+  }
+
+  .column > h3 {
+    font-size: 18px;
+  }
+
+  p {
+    font-size: 16px;
+  }
+
+  .column > form > input {
+    padding: 6px;
+    font-size: 16px;
+  }
+}
