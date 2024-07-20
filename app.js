@@ -1,101 +1,85 @@
-const main = document.querySelector("#main");
-const addCardBtn = document.querySelector("#addCard");
+const mainContainer = document.querySelector("#main");
+const addCardButton = document.querySelector("#addCard");
 
-let woElementJoUthaHuaHy = null;
+let draggedElement = null;
 
 const addTask = (event) => {
   event.preventDefault();
 
-  const currentForm = event.target; // current form element
-  const value = currentForm.elements[0].value; // value written in form's input
-  const parent = currentForm.parentElement; // parent of form i.e div.column
-  const ticket = createTicket(value); // div to be added
+  const currentForm = event.target;
+  const taskValue = currentForm.elements[0].value;
+  const columnDiv = currentForm.parentElement;
+  const newTicket = createTicket(taskValue);
 
-  if (!value) return; // null check
+  if (!taskValue) return;
 
-  parent.insertBefore(ticket, currentForm); // adding new task before the form
+  columnDiv.insertBefore(newTicket, currentForm);
 
-  const h3Value = parent.children[0].innerText;
+  const columnTitle = columnDiv.children[0].innerText;
 
-  if (!Array.isArray(savedTasks[h3Value])) {
-    // agar array nhi hy tw khali array set karwa do kyu ky undefined ma .push() nhi ho sagta
-    savedTasks[h3Value] = [];
+  if (!Array.isArray(savedTasks[columnTitle])) {
+    savedTasks[columnTitle] = [];
   }
 
-  savedTasks[h3Value].push(value);
+  savedTasks[columnTitle].push(taskValue);
 
-  localStorage.setItem("savedTasks", JSON.stringify(savedTasks)); // saving data after adding each task
+  localStorage.setItem("savedTasks", JSON.stringify(savedTasks));
 
-  currentForm.reset(); // clearing form
+  currentForm.reset();
 };
 
-const myCreateCard = (cardTitle) => {
-  // This function will return a div like one below
-  /* <div class="column">
-           <h3>smit</h3>
-  
-           <form>
-               <input type="text" placeholder="add task" />
-           </form>
-     </div> */
+const createCard = (cardTitle) => {
+  const cardDiv = document.createElement("div");
+  const titleHeading = document.createElement("h3");
+  const taskForm = document.createElement("form");
+  const taskInput = document.createElement("input");
 
-  const myDiv = document.createElement("div");
-  const myH3 = document.createElement("h3");
-  const myForm = document.createElement("form");
-  const myInput = document.createElement("input");
+  const headingText = document.createTextNode(cardTitle);
 
-  const h3Text = document.createTextNode(cardTitle);
+  cardDiv.setAttribute("class", "column");
+  taskInput.setAttribute("type", "text");
+  taskInput.setAttribute("placeholder", "Add task");
 
-  myDiv.setAttribute("class", "column");
-  myInput.setAttribute("type", "text");
-  myInput.setAttribute("placeholder", "add task");
+  titleHeading.appendChild(headingText);
+  taskForm.appendChild(taskInput);
+  cardDiv.appendChild(titleHeading);
+  cardDiv.appendChild(taskForm);
 
-  myH3.appendChild(h3Text);
-  myForm.appendChild(myInput);
-  myDiv.appendChild(myH3);
-  myDiv.appendChild(myForm);
+  taskForm.addEventListener("submit", addTask);
 
-  myForm.addEventListener("submit", addTask);
+  cardDiv.addEventListener("dragover", (event) => {
+    event.preventDefault();
+  });
 
-  myDiv.addEventListener("dragleave", (event) => event.preventDefault());
-  myDiv.addEventListener("dragover", (event) => event.preventDefault());
+  cardDiv.addEventListener("drop", (event) => {
+    event.preventDefault();
+    const targetElement = event.target;
 
-  myDiv.addEventListener("drop", (event) => {
-    const jisElementPerDropKiyaJaRahaHo = event.target;
-
-    if (jisElementPerDropKiyaJaRahaHo.className.includes("column")) {
-      // console.log("2");
-      jisElementPerDropKiyaJaRahaHo.appendChild(woElementJoUthaHuaHy);
-    }
-
-    if (jisElementPerDropKiyaJaRahaHo.className.includes("ticket")) {
-      jisElementPerDropKiyaJaRahaHo.parentElement.appendChild(
-        woElementJoUthaHuaHy
-      );
+    if (targetElement.tagName === "INPUT" || targetElement.classList.contains("column")) {
+      const columnDiv = targetElement.tagName === "INPUT" ? targetElement.parentElement : targetElement;
+      columnDiv.insertBefore(draggedElement, targetElement);
     }
   });
 
-  return myDiv;
+  return cardDiv;
 };
 
-const createTicket = (value) => {
-  //
-  const ticket = document.createElement("p");
-  const elementText = document.createTextNode(value);
+const createTicket = (taskValue) => {
+  const ticketParagraph = document.createElement("p");
+  const ticketText = document.createTextNode(taskValue);
 
-  ticket.setAttribute("draggable", "true");
-  ticket.setAttribute("class", "ticket");
-  ticket.appendChild(elementText);
+  ticketParagraph.setAttribute("draggable", "true");
+  ticketParagraph.setAttribute("class", "ticket");
+  ticketParagraph.appendChild(ticketText);
 
-  ticket.addEventListener("mousedown", (event) => {
-    woElementJoUthaHuaHy = event.target;
-    console.log("1");
+  ticketParagraph.addEventListener("dragstart", (event) => {
+    draggedElement = event.target;
   });
 
-  return ticket;
+  return ticketParagraph;
 };
 
-let savedTasks = JSON.parse(localStorage.getItem("savedTasks")); // fetching savedTasks obj and converting
+let savedTasks = JSON.parse(localStorage.getItem("savedTasks"));
 
 if (!savedTasks) {
   savedTasks = {};
@@ -103,28 +87,23 @@ if (!savedTasks) {
 
 // Displaying the tasks already saved in localStorage
 for (const title in savedTasks) {
-  const card = myCreateCard(title);
+  const card = createCard(title);
 
-  const arrayOfTasks = savedTasks[title];
+  const tasksArray = savedTasks[title];
 
-  for (let i = 0; i < arrayOfTasks.length; i++) {
-    const p = createTicket(arrayOfTasks[i]); // we are creating paras with each tasks
+  tasksArray.forEach((task) => {
+    const taskElement = createTicket(task);
+    card.insertBefore(taskElement, card.lastElementChild);
+  });
 
-    card.insertBefore(p, card.lastElementChild);
-  }
-
-  main.insertBefore(card, addCardBtn);
+  mainContainer.insertBefore(card, addCardButton);
 }
 
-addCardBtn.addEventListener("click", () => {
-  const cardTitle = prompt("enter card name?");
+addCardButton.addEventListener("click", () => {
+  const newCardTitle = prompt("Enter card name:");
 
-  if (!cardTitle) return;
+  if (!newCardTitle) return;
 
-  const yourDiv = myCreateCard(cardTitle);
-
-  main.insertBefore(yourDiv, addCardBtn);
+  const newCardDiv = createCard(newCardTitle);
+  mainContainer.insertBefore(newCardDiv, addCardButton);
 });
-
-
-
